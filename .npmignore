@@ -1,0 +1,12 @@
+node_modules
+.idea
+.vscode
+.DS_Store
+.env
+
+example
+src
+
+webpack.config.js
+webpack.example.config.js
+package-lock.json
