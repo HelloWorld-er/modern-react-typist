@@ -10,6 +10,7 @@ module.exports = {
         filename: "[name].js",
         library:  "Typist",
         libraryTarget: "umd",
+        globalObject: "typeof self !== 'undefined' ? self : this",
         clean: true,
     },
     module: {
