@@ -8,8 +8,10 @@ module.exports = {
     output: {
         path: path.join(__dirname, "dist"),
         filename: "[name].js",
-        library:  "Typist",
-        libraryTarget: "umd",
+        library:  {
+            name: "Typist",
+            type: "umd",
+        },
         globalObject: "typeof self !== 'undefined' ? self : this",
         clean: true,
     },
