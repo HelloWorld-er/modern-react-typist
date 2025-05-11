@@ -1,9 +1,8 @@
-import React from "react";
+"use client";
 
-import {useState, useEffect, isValidElement, cloneElement, Fragment, memo} from "react";
+import React, {useState, useEffect, isValidElement, cloneElement, Fragment} from "react";
 
-const Typist = memo(({ children, cursor = <span className="animate-pulse mx-2">|</span>, delay = 100, rootKey = "typistRoot"}) => {
-    // const rootKey = "typistRoot";
+export default function Typist({ children, cursor = <span className="animate-pulse mx-2">|</span>, delay = 100, rootKey = "typistRoot"}) {
     const cursorNode = cloneElement(cursor, {
         key: rootKey + "-cursor",
     })
@@ -113,6 +112,4 @@ const Typist = memo(({ children, cursor = <span className="animate-pulse mx-2">|
             {typedText}
         </>
     );
-})
-
-export default Typist;
+}

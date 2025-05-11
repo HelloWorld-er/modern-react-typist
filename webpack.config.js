@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 
 module.exports = {
     mode: "production",
@@ -29,6 +30,14 @@ module.exports = {
             },
         ],
     },
+    plugins: [
+        new webpack.BannerPlugin({
+            banner: '\"use client\";',
+            raw: true,
+            entryOnly: true,
+            stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT,
+        })
+    ],
     resolve: {
         extensions: [".js", ".jsx"],
         modules: [path.join(__dirname, "node_modules"), path.join(__dirname, "src")],
