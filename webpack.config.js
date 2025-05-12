@@ -2,15 +2,14 @@ const path = require("path");
 const webpack = require("webpack");
 
 module.exports = {
-    mode: "production",
     entry: {
-        Typist: path.join(__dirname, "src/typist.jsx"),
+        Typist: "./src/Typist.tsx",
     },
     output: {
-        path: path.join(__dirname, "dist"),
+        path: path.resolve(__dirname, "dist"),
         filename: "[name].js",
-        library:  {
-            name: "Typist",
+        library: {
+            name: "ModernReactTypist",
             type: "umd",
         },
         globalObject: "typeof self !== 'undefined' ? self : this",
@@ -19,30 +18,43 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.(js|jsx)$/,
+                test: /\.tsx?$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: "ts-loader",
+                }
+            },
+            {
+                test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
                     loader: "babel-loader",
                     options: {
-                        presets: ["@babel/preset-env", "@babel/preset-react"],
-                    },
-                },
-            },
-        ],
+                        presets: [
+                            "@babel/preset-env",
+                            "@babel/preset-react"
+                        ],
+                        plugins: [
+                            "@babel/plugin-transform-runtime"
+                        ]
+                    }
+                }
+            }
+        ]
     },
     plugins: [
         new webpack.BannerPlugin({
-            banner: '\"use client\";',
+            banner: "\'use client\';",
             raw: true,
             entryOnly: true,
-            stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT,
-        })
+            stage: webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
+        }),
     ],
-    resolve: {
-        extensions: [".js", ".jsx"],
-        modules: [path.join(__dirname, "node_modules"), path.join(__dirname, "src")],
-    },
     externals: {
-        react: "react",
+        react: "React",
+        "react-dom": "ReactDOM",
+    },
+    resolve: {
+        extensions: [".tsx", ".ts", ".js"]
     }
-}
+};

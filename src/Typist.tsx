@@ -1,20 +1,31 @@
-"use client";
+import React from "react";
+import {useState, useEffect, isValidElement, cloneElement, Fragment, ReactNode, ReactElement} from "react";
 
-import React, {useState, useEffect, isValidElement, cloneElement, Fragment} from "react";
+type TreeNodeProps = React.PropsWithChildren<{ otherProps?: string }>;
 
-export default function Typist({ children, cursor = <span className="animate-pulse mx-2">|</span>, delay = 100, rootKey = "typistRoot"}) {
+interface TypistProps {
+    children: ReactNode;
+    cursor?: ReactElement;
+    delay?: number;
+    rootKey?: string;
+}
+
+export default function Typist({ children, cursor = <Fragment></Fragment>, delay = 100, rootKey = "typistRoot"}: TypistProps) {
     const cursorNode = cloneElement(cursor, {
         key: rootKey + "-cursor",
     })
-    const [typedText, setTypedText] = useState(null);
+    const [typedText, setTypedText] = useState<ReactNode | null>(null);
 
     class TreeNode {
-        constructor(value) {
+        value: ReactNode;
+        children: (TreeNode | string)[];
+
+        constructor(value: ReactNode) {
             this.value = value;
             this.children = [];
         }
 
-        addChild(child) {
+        addChild(child: TreeNode | string) {
             this.children.push(child);
         }
     }
@@ -22,10 +33,10 @@ export default function Typist({ children, cursor = <span className="animate-pul
     useEffect(() => {
         setTypedText(null);
         const rootTreeNode = new TreeNode(<Fragment></Fragment>);
-        const treeNodeKeys = {[rootKey]: rootTreeNode};
-        let charKeys = [];
+        const treeNodeKeys: Record<string, TreeNode | string> = {[rootKey]: rootTreeNode};
+        let charKeys: string[] = [];
 
-        function formNodeTree(treeNode, node, keyPrefix) {
+        function formNodeTree(treeNode: TreeNode, node: ReactNode, keyPrefix: string) {
             if (isValidElement(node)) {
                 const newKeyPrefix = keyPrefix + "/" + (treeNode.children.length);
                 const clonedNode = cloneElement(node, {
@@ -33,12 +44,13 @@ export default function Typist({ children, cursor = <span className="animate-pul
                 });
                 treeNode.addChild(new TreeNode(clonedNode));
                 treeNodeKeys[newKeyPrefix] = treeNode.children[treeNode.children.length - 1];
-                if  (node.props.children != null && typeof node.props.children[Symbol.iterator] === 'function') {
-                    for (const child of node.props.children) {
-                        formNodeTree(treeNode.children[treeNode.children.length - 1], child, newKeyPrefix);
+                const nodeProps = node.props as { children?: React.ReactNode };
+                if  (nodeProps.children != null && typeof nodeProps.children[Symbol.iterator] === 'function') {
+                    for (const child of React.Children.toArray(nodeProps.children)) {
+                        formNodeTree(treeNode.children[treeNode.children.length - 1] as TreeNode, child, newKeyPrefix);
                     }
                 }
-                else formNodeTree(treeNode.children[treeNode.children.length - 1], node.props.children, newKeyPrefix);
+                else formNodeTree(treeNode.children[treeNode.children.length - 1] as TreeNode, nodeProps.children, newKeyPrefix);
             }
             else if (Array.isArray(node)) {
                 for (const child of node) {
@@ -53,11 +65,12 @@ export default function Typist({ children, cursor = <span className="animate-pul
                     charKeys.push(newKeyPrefix);
                 }
                 else {
-                    treeNode.addChild(new TreeNode(node));
+                    const stringNode = new TreeNode(node);
+                    treeNode.addChild(stringNode);
                     const newKeyPrefix = keyPrefix + "/" + (treeNode.children.length - 1);
                     treeNodeKeys[newKeyPrefix] = treeNode.children[treeNode.children.length - 1];
                     for (const char of node) {
-                        formNodeTree(treeNode.children[treeNode.children.length - 1], char, newKeyPrefix);
+                        formNodeTree(stringNode, char, newKeyPrefix);
                     }
                 }
             }
@@ -70,18 +83,18 @@ export default function Typist({ children, cursor = <span className="animate-pul
         const interval = setInterval(() => {
             const charKey = charKeys[charKeyIndex];
             const charKeyTreeIndex = charKey.split('/').slice(1).map(Number);
-            let childNode = treeNodeKeys[charKey];
+            let childNode = treeNodeKeys[charKey] as ReactNode;
             let addCursor = false;
             while (charKeyTreeIndex.length) {
-                const nodes = [];
+                const nodes: (ReactNode | string)[] = [];
                 const currentKeyPrefix = charKeyTreeIndex.length === 1 ? rootKey : rootKey + '/' + charKeyTreeIndex.slice(0, charKeyTreeIndex.length - 1).join('/');
                 const currentKeyIndex = Number(charKeyTreeIndex[charKeyTreeIndex.length - 1]);
                 for (let i = 0; i < currentKeyIndex; i ++) {
-                    if (typeof treeNodeKeys[currentKeyPrefix + '/' + i] === "string") nodes.push(treeNodeKeys[currentKeyPrefix + "/" + i]);
-                    else nodes.push(treeNodeKeys[currentKeyPrefix + '/' + i].value);
+                    if (typeof treeNodeKeys[currentKeyPrefix + '/' + i] === "string") nodes.push(treeNodeKeys[currentKeyPrefix + "/" + i] as string);
+                    else nodes.push((treeNodeKeys[currentKeyPrefix + '/' + i] as TreeNode).value);
                 }
                 nodes.push(childNode);
-                if (typeof treeNodeKeys[currentKeyPrefix].value === "string") {
+                if (typeof (treeNodeKeys[currentKeyPrefix] as TreeNode).value === "string") {
                     childNode = nodes.join("");
                 }
                 else {
@@ -89,9 +102,9 @@ export default function Typist({ children, cursor = <span className="animate-pul
                         nodes.push(cursorNode);
                         addCursor = true;
                     }
-                    childNode = cloneElement(treeNodeKeys[currentKeyPrefix].value, {
+                    childNode = cloneElement((treeNodeKeys[currentKeyPrefix] as TreeNode).value as ReactElement<TreeNodeProps>, {
                         children: nodes
-                    })
+                    }) as ReactNode;
                 }
                 charKeyTreeIndex.pop();
             }
@@ -108,8 +121,8 @@ export default function Typist({ children, cursor = <span className="animate-pul
     }, [children, delay])
 
     return (
-        <>
+        <Fragment>
             {typedText}
-        </>
+        </Fragment>
     );
 }

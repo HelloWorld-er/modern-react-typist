@@ -4,9 +4,7 @@ node_modules
 .DS_Store
 .env
 
-example
 src
 
 webpack.config.js
-webpack.example.config.js
 package-lock.json
