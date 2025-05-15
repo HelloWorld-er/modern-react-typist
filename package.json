@@ -1,12 +1,11 @@
 {
   "name": "modern-react-typist",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A modern typist component written in React and Typescript",
   "main": "./dist/Typist.js",
   "types": "./dist/Typist.d.ts",
   "scripts": {
-    "build": "webpack --mode production",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack --mode production"
   },
   "repository": {
     "type": "git",
@@ -41,7 +40,7 @@
     "webpack-cli": "^6.0.1"
   },
   "peerDependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }

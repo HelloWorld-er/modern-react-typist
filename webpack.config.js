@@ -3,22 +3,22 @@ const webpack = require("webpack");
 
 module.exports = {
     entry: {
-        Typist: "./src/Typist.tsx",
+        Typist: path.join(__dirname, "./src/Typist.tsx"),
     },
     output: {
-        path: path.resolve(__dirname, "dist"),
+        path: path.join(__dirname, "dist"),
         filename: "[name].js",
         library: {
             name: "ModernReactTypist",
             type: "umd",
         },
-        globalObject: "typeof self !== 'undefined' ? self : this",
+        globalObject: "this",
         clean: true,
     },
     module: {
         rules: [
             {
-                test: /\.tsx?$/,
+                test: /\.tsx$/,
                 exclude: /node_modules/,
                 use: {
                     loader: "ts-loader",
@@ -35,10 +35,13 @@ module.exports = {
                             "@babel/preset-react"
                         ],
                         plugins: [
-                            "@babel/plugin-transform-runtime"
+                            "@babel/plugin-transform-runtime",
+                            "@babel/plugin-proposal-class-properties",
+                            "@babel/plugin-proposal-object-rest-spread"
                         ]
                     }
                 }
+
             }
         ]
     },
@@ -51,8 +54,8 @@ module.exports = {
         }),
     ],
     externals: {
-        react: "React",
-        "react-dom": "ReactDOM",
+        react: "react",
+        "react-dom": "react-dom"
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js"]

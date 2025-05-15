@@ -1,5 +1,6 @@
-import React from "react";
-import {useState, useEffect, isValidElement, cloneElement, Fragment, ReactNode, ReactElement} from "react";
+'use client';
+
+import React, {useState, useEffect, isValidElement, cloneElement, Fragment, ReactNode, ReactElement} from "react";
 
 type TreeNodeProps = React.PropsWithChildren<{ otherProps?: string }>;
 
