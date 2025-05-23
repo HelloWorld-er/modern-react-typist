@@ -8,3 +8,4 @@ src
 
 webpack.config.js
 package-lock.json
+/example
