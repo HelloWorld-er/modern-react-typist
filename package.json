@@ -1,6 +1,6 @@
 {
   "name": "modern-react-typist",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A modern typist component written in React and Typescript",
   "main": "./dist/Typist.js",
   "types": "./dist/Typist.d.ts",
